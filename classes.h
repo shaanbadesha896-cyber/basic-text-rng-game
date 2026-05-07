@@ -58,6 +58,7 @@ public:
     void mage_combat(Enemy& enemy);
     void mage_damage(Player& player, Enemy& enemy, int damage, bool& helper);
     void mage_game_over(Player& player, bool& helper);
+    void heal();
     void full_heal();
     void evade_after_evade(Player& player, Enemy& enemy, int enemy_dmg, bool helper);
 };
