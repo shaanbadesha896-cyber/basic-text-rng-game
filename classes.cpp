@@ -28,7 +28,12 @@ void Player::full_heal() {
 }
 
 void Enemy::silent() {
-    if (IsSilenced) hp -= hp * 0.05;
+    slowdown(slowdown1);
+    std::cout << "Enemy is hit by Mage's special ability, Silence";
+    if (IsSilenced) {
+        hp -= hp * 0.05;
+        std::cout << "The enemy loses 5% of his hp from being silenced, Enemy hp: " << enemy.hp << "\n";
+    }
 }
 
 void Enemy::Charge(Player& player, Mage& mage) {}
@@ -52,7 +57,8 @@ void Enemy::enemy_combat(Player& player, Enemy& enemy, Mage& mage, bool helper) 
         if (player.current_hp < 0) player.current_hp = 0;
         slowdown(slowdown1);
         std::cout << "Enemy attacks for " << enemy_dmg << " damage! Your HP: " << player.current_hp << "\n";
-    } else {
+    } 
+    else {
         mage.mage_damage(player, enemy, enemy_dmg, helper);
     }
 }
@@ -67,13 +73,23 @@ void Knight::Charge(Player& player, Mage& mage) {
 }
 
 void Mage::mage_combat(Enemy& enemy) {
-    int mage_dmg = randomint(mage_min_dmg, mage_max_dmg) * 5;
-    enemy.hp -= mage_dmg;
-    current_mana -= 10;
-    slowdown(slowdown1);
-    std::cout << "Mage casts a spell for " << mage_dmg << " dmg\n";
-    if (randomint(1, 100) <= silence) enemy.IsSilenced = true;
-    enemy.silent();
+    if(current_mana > 10){
+        int mage_dmg = randomint(mage_min_dmg, mage_max_dmg) * 5;
+        enemy.hp -= mage_dmg;
+        current_mana -= 10;
+        slowdown(slowdown1);
+        std::cout << "Mage casts a spell for " << mage_dmg << " dmg\n";
+        if (randomint(1, 100) <= silence) {
+            enemy.IsSilenced = true;
+            enemy.silent();
+        }
+    }
+
+    else{
+        slowdown(slowdown1); 
+        std::cout << "Mage has run out of mana to cast";
+        heal();
+    }
 }
 
 void Mage::mage_damage(Player& player, Enemy& enemy, int damage, bool& helper) {
@@ -90,15 +106,26 @@ void Mage::mage_game_over(Player& player, bool& helper) {
     std::cout << "The mage passed away in battle\n";
 }
 
-void Mage::full_heal() { current_hp = max_hp; current_mana = max_mana; }
+void Mage::heal(){
+    current_hp += 5; 
+    current_mana += 5;
+    std::cout << "Mage heals, Mana " << current_mana << " HP: " << current_hp << "\n";
+}
+
+void Mage::full_heal() { 
+    current_hp = max_hp; current_mana = max_mana; 
+}
 
 void Mage::evade_after_evade(Player& player, Enemy& enemy, int enemy_dmg, bool helper) {
     int double_evade = evade * 2;
-    if (double_evade > 100) double_evade = 100;
+    if (double_evade > 100) {
+        double_evade = 100;
+    }
     if (randomint(1, 100) <= double_evade) {
         std::cout << "The mage dodges too!\n";
         combatmode(player, enemy, *this, helper);
-    } else {
+    } 
+    else {
         std::cout << "But the mage gets hit instead\n";
         mage_damage(player, enemy, enemy_dmg, helper);
     }
